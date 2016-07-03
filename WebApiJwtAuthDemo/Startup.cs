@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebApiJwtAuthDemo.Options;
 
 namespace WebApiJwtAuthDemo
 {
@@ -20,11 +25,35 @@ namespace WebApiJwtAuthDemo
 
     public IConfigurationRoot Configuration { get; }
 
+    private const string SecretKey = "needtogetthisfromenvironment";
+    private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
       // Add framework services.
-      services.AddMvc();
+      services.AddOptions();
+
+      // Make authentication compulsory across the board (i.e. shut
+      // down EVERYTHING unless explicitly opened up).
+      services.AddMvc(config =>
+      {
+        var policy = new AuthorizationPolicyBuilder()
+                         .RequireAuthenticatedUser()
+                         .Build();
+        config.Filters.Add(new AuthorizeFilter(policy));
+      });
+
+      // Get options from app settings
+      var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
+
+      // Configure JwtIssuerOptions
+      services.Configure<JwtIssuerOptions>(options =>
+      {
+        options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+        options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
+        options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
