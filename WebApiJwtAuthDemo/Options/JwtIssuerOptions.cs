@@ -53,7 +53,7 @@ namespace WebApiJwtAuthDemo.Options
     ///   provide for some small leeway, usually no more than a few minutes, to
     ///   account for clock skew.  Its value MUST be a number containing a
     ///   NumericDate value.  Use of this claim is OPTIONAL.</remarks>
-    public DateTime NotBefore { get; set; } = DateTime.UtcNow;
+    public DateTime NotBefore => DateTime.UtcNow;
 
     /// <summary>
     /// "iat" (Issued At) Claim (default is UTC NOW)
@@ -62,7 +62,7 @@ namespace WebApiJwtAuthDemo.Options
     ///   issued.  This claim can be used to determine the age of the JWT.  Its
     ///   value MUST be a number containing a NumericDate value.  Use of this
     ///   claim is OPTIONAL.</remarks>
-    public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
+    public DateTime IssuedAt => DateTime.UtcNow;
 
     /// <summary>
     /// Set the timespan the token will be valid for (default is 5 min/300 seconds)

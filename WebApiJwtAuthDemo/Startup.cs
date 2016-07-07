@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using WebApiJwtAuthDemo.Options;
 
@@ -44,6 +45,13 @@ namespace WebApiJwtAuthDemo
         config.Filters.Add(new AuthorizeFilter(policy));
       });
 
+      // Use policy auth.
+      services.AddAuthorization(options =>
+      {
+        options.AddPolicy("DisneyUser",
+                          policy => policy.RequireClaim("DisneyCharacter", "IAmMickey"));
+      });
+
       // Get options from app settings
       var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
 
@@ -61,6 +69,31 @@ namespace WebApiJwtAuthDemo
     {
       loggerFactory.AddConsole(Configuration.GetSection("Logging"));
       loggerFactory.AddDebug();
+
+      var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
+      var tokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
+
+        ValidateAudience = true,
+        ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
+
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = _signingKey,
+
+        RequireExpirationTime = true,
+        ValidateLifetime = true,
+
+        ClockSkew = TimeSpan.Zero
+      };
+
+      app.UseJwtBearerAuthentication(new JwtBearerOptions
+      {
+        AutomaticAuthenticate = true,
+        AutomaticChallenge = true,
+        TokenValidationParameters = tokenValidationParameters
+      });
 
       app.UseMvc();
     }

@@ -116,7 +116,7 @@ namespace WebApiJwtAuthDemo.Controllers
       }
 
       if (user.UserName == "NotMickeyMouse" &&
-          user.Password == "MickeyMouseIsBoss123")
+          user.Password == "NotMickeyMouseIsBoss123")
       {
         return Task.FromResult(new ClaimsIdentity(new GenericIdentity(user.UserName, "Token"),
           new Claim[] { }));
