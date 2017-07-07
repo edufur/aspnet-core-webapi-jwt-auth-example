@@ -61,6 +61,8 @@
   <ItemGroup>
     <Build Include="tbl_User.sql" />
     <Build Include="tbl_Keys.sql" />
+    <Build Include="usp_GetUsers.sql" />
+    <Build Include="usp_GetKeys.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="UserAuthDatabase.refactorlog" />

@@ -9,11 +9,9 @@ namespace WebApiJwtAuthDemo.Models
         public virtual DbSet<TblKeys> TblKeys { get; set; }
         public virtual DbSet<TblUser> TblUser { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            optionsBuilder.UseSqlServer(@"Server=localhost;Database=KeysDB;Trusted_Connection=True;");
-        }
+        public KeysDBContext(DbContextOptions<KeysDBContext> options)
+    : base(options)
+        { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

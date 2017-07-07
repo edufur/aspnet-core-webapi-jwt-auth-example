@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
 using WebApiJwtAuthDemo.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApiJwtAuthDemo
 {
@@ -39,7 +40,10 @@ namespace WebApiJwtAuthDemo
       // down EVERYTHING unless explicitly opened up).
       services.AddMvc(config =>
       {
-        var policy = new AuthorizationPolicyBuilder()
+          var connection = @"Server=localhost;Database=KeysDB;Trusted_Connection=True;";
+          services.AddDbContext<Models.KeysDBContext>(options => options.UseSqlServer(connection));
+
+          var policy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
         config.Filters.Add(new AuthorizeFilter(policy));
